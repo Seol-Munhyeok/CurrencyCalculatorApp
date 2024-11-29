@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#f2f2f2"
+    android:padding="16dp">
+
+    <!-- 현재 시간 -->
+    <TextView
+        android:id="@+id/currentTimeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="업데이트: 5:34, 오후 11월 29, 2024"
+        android:textSize="14sp"
+        android:paddingBottom="8dp" />
+
+    <!-- 국가 및 환율 정보 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingBottom="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- 국가 1 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingBottom="8dp">
+
+                <!-- 국기 아이콘 -->
+                <ImageView
+                    android:id="@+id/flagImageView1"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_flag_placeholder" />
+
+                <!-- 국가 텍스트뷰 -->
+                <TextView
+                    android:id="@+id/currencyTextView1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="KRW"
+                    android:background="#FFFFFF"
+                    android:padding="8dp"
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <!-- 금액 출력 -->
+                <TextView
+                    android:id="@+id/currencyOutput1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="16dp"
+                    android:text="0"
+                    android:textAlignment="center"
+                    android:background="#FFFFFF"
+                    android:padding="8dp" />
+            </LinearLayout>
+
+            <!-- 금액의 한글 표시 -->
+            <TextView
+                android:id="@+id/amountTextViewKorean1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="12dp"
+                android:padding="8dp"
+                android:text="금액을 한글로 읽기"
+                android:textSize="16sp"
+                android:background="#E0E0E0"
+                android:gravity="center" />
+
+            <!-- 국가 2 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingBottom="8dp">
+
+                <ImageView
+                    android:id="@+id/flagImageView2"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_flag_placeholder" />
+
+                <TextView
+                    android:id="@+id/currencyTextView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="USD"
+                    android:background="#FFFFFF"
+                    android:padding="8dp"
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <TextView
+                    android:id="@+id/currencyOutput2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="16dp"
+                    android:text="0"
+                    android:textAlignment="center"
+                    android:background="#FFFFFF"
+                    android:padding="8dp" />
+            </LinearLayout>
+
+            <!-- 금액의 한글 표시 -->
+            <TextView
+                android:id="@+id/amountTextViewKorean2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="12dp"
+                android:padding="8dp"
+                android:text="금액을 한글로 읽기"
+                android:textSize="16sp"
+                android:background="#E0E0E0"
+                android:gravity="center" />
+
+            <!-- 국가 3 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingBottom="8dp">
+
+                <ImageView
+                    android:id="@+id/flagImageView3"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_flag_placeholder" />
+
+                <TextView
+                    android:id="@+id/currencyTextView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="JPY"
+                    android:background="#FFFFFF"
+                    android:padding="8dp"
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <TextView
+                    android:id="@+id/currencyOutput3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="16dp"
+                    android:text="0"
+                    android:textAlignment="center"
+                    android:background="#FFFFFF"
+                    android:padding="8dp" />
+            </LinearLayout>
+
+            <!-- 금액의 한글 표시 -->
+            <TextView
+                android:id="@+id/amountTextViewKorean3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="12dp"
+                android:padding="8dp"
+                android:text="금액을 한글로 읽기"
+                android:textSize="16sp"
+                android:background="#E0E0E0"
+                android:gravity="center" />
+        </LinearLayout>
+    </ScrollView>
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="4"
+        android:rowCount="4"
+        android:padding="8dp"
+        android:layout_marginTop="16dp">
+
+        <!-- Clear 버튼 -->
+        <Button
+            android:id="@+id/buttonClear"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="1"
+            android:layout_rowSpan="1"
+            android:layout_columnWeight="1"
+            android:text="C"
+            android:layout_gravity="fill" />
+
+        <!-- 숫자 버튼 -->
+        <Button
+            android:id="@+id/button7"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text="7"
+            android:layout_gravity="fill" />
+
+        <Button
+            android:id="@+id/button8"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text="8"
+            android:layout_gravity="fill" />
+
+        <Button
+            android:id="@+id/button9"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text="9"
+            android:layout_gravity="fill" />
+
+        <!-- 숫자 4, 5, 6 -->
+        <Button
+            android:id="@+id/button_tmp1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text="tmp1"
+            android:layout_gravity="fill" />
+
+        <Button
+            android:id="@+id/button4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text="4"
+            android:layout_gravity="fill" />
+
+        <Button
+            android:id="@+id/button5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text="5"
+            android:layout_gravity="fill" />
+
+        <!-- 나머지 숫자 1, 2, 3 -->
+        <Button
+            android:id="@+id/button6"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text="6"
+            android:layout_gravity="fill" />
+
+        <Button
+            android:id="@+id/buttontmp2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text="tmp2"
+            android:layout_gravity="fill" />
+
+        <Button
+            android:id="@+id/button1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text="1"
+            android:layout_gravity="fill" />
+
+        <!-- 0 버튼 및 . -->
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text="2"
+            android:layout_gravity="fill" />
+
+        <Button
+            android:id="@+id/button3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text="3"
+            android:layout_gravity="fill" />
+
+        <Button
+            android:id="@+id/buttontmp3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text="tmp3"
+            android:layout_gravity="fill" />
+
+        <Button
+            android:id="@+id/button0"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:layout_gravity="fill" />
+
+        <Button
+            android:id="@+id/button00"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="00"
+            android:layout_gravity="fill" />
+
+        <!-- 지우기 버튼 -->
+        <Button
+            android:id="@+id/buttonDelete"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text="←"
+            android:layout_gravity="fill" />
+    </GridLayout>
+
+</LinearLayout>
