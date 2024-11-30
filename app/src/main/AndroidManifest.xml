@@ -23,6 +23,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".CountrySelectionActivity" />
+        <activity android:name=".GraphActivity" />
     </application>
 
 </manifest>

@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -71,6 +72,18 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
+        for (int i = 0; i < countryTextViews.length; i++) {
+            int finalI = i;
+
+            findViewById(getResources().getIdentifier("graphButton" + (i + 1), "id", getPackageName()))
+                    .setOnClickListener(view -> {
+                        Intent intent = new Intent(MainActivity.this, GraphActivity.class);
+                        String targetCurrency = countryTextViews[finalI].getText().toString();
+                        intent.putExtra("targetCurrency", targetCurrency);
+                        startActivity(intent);
+                    });
+        }
+
         for (int i = 0; i < currencyOutputTextViews.length; i++) {
             int finalI = i;
             currencyOutputTextViews[i].setOnClickListener(view -> {
@@ -92,11 +105,7 @@ public class MainActivity extends AppCompatActivity {
         setupCalculatorButtons();
     }
 
-    private void initViews() {
-
-    }
-
-    private static final long MAX_INPUT_VALUE = 9_999_999_999_999L;
+    private static final int MAX_INPUT_LENGTH = 15;
     private void setupCalculatorButtons() {
         int[] buttonIds = {
                 R.id.button0, R.id.button1, R.id.button2, R.id.button3,
@@ -112,32 +121,39 @@ public class MainActivity extends AppCompatActivity {
                 Button button = (Button) view;
                 String buttonText = button.getText().toString();
 
-                if (buttonText.equals("C")) {
-                    currentInput.setLength(0);
-                    currencyOutputTextViews[selectedCountryIndex].setText("0");
-                } else if (buttonText.equals("←")) {
-                    if (currentInput.length() > 0) {
-                        currentInput.deleteCharAt(currentInput.length() - 1);
-                    } else {
+                switch (buttonText) {
+                    case "C":
+                        currentInput.setLength(0);
                         currencyOutputTextViews[selectedCountryIndex].setText("0");
-                    }
-                } else if (buttonText.equals("00")) {
-                    currentInput.append("00");
-                    currencyOutputTextViews[selectedCountryIndex].setText("0");
-                }
-                else {
-                    if (currentInput.length() > 0) {
-                        long currentValue = Long.parseLong(currentInput.toString());
-                        if (currentValue > MAX_INPUT_VALUE) {
-                            Toast.makeText(
-                                    this,
-                                    "입력 값이 너무 큽니다!",
-                                    Toast.LENGTH_SHORT
-                            ).show();
+                        break;
+                    case "←":
+                        if (currentInput.length() > 0) {
+                            currentInput.deleteCharAt(currentInput.length() - 1);
+                        } else {
+                            currencyOutputTextViews[selectedCountryIndex].setText("0");
+                        }
+                        break;
+                    case "00":
+                        if (currentInput.length() + 2 > MAX_INPUT_LENGTH) {
+                            Toast.makeText(this, "입력 길이가 너무 깁니다!", Toast.LENGTH_SHORT).show();
                             return;
                         }
-                    }
-                    currentInput.append(buttonText);
+                        currentInput.append("00");
+                        currencyOutputTextViews[selectedCountryIndex].setText("0");
+                        break;
+                    default:
+                        if (currentInput.length() + 1 > MAX_INPUT_LENGTH) {
+                            Toast.makeText(this, "입력 길이가 너무 깁니다!", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        try {
+                            String newInput = currentInput.toString() + buttonText;
+                            Long.parseLong(newInput);
+                            currentInput.append(buttonText);
+                        } catch (NumberFormatException e) {
+                            Toast.makeText(this, "입력 값이 너무 큽니다!", Toast.LENGTH_SHORT).show();
+                        }
+                        break;
                 }
 
                 String inputText = currentInput.toString();
@@ -157,7 +173,13 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        double baseAmount = Double.parseDouble(currentInput.toString());
+        double baseAmount;
+        try {
+            baseAmount = Double.parseDouble(currentInput.toString());
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "입력 값 오류가 발생했습니다!", Toast.LENGTH_SHORT).show();
+            return;
+        }
         String baseCurrency = countryTextViews[selectedCountryIndex].getText().toString();
 
         for (int i = 0; i < countryTextViews.length; i++) {
@@ -187,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
 
         apiService.getLatestRates(apiKey).enqueue(new Callback<CurrencyResponse>() {
             @Override
-            public void onResponse(Call<CurrencyResponse> call, Response<CurrencyResponse> response) {
+            public void onResponse(@NonNull Call<CurrencyResponse> call, Response<CurrencyResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     CurrencyResponse rates = response.body();
 
@@ -289,8 +311,13 @@ public class MainActivity extends AppCompatActivity {
                 countryTextViews[countryIndex].setText(selectedCountry);
                 flagImageViews[countryIndex].setImageResource(selectedFlag);
 
+                String inputText = currentInput.toString();
+                currencyOutputTextViews[countryIndex].setText(inputText.isEmpty() ? "0" : inputText);
+
                 updateExchangeRates();
             }
         }
     }
+
+
 }
