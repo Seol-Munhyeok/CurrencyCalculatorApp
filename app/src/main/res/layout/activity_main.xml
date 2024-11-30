@@ -202,7 +202,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_columnSpan="1"
-            android:layout_rowSpan="1"
+            android:layout_rowSpan="4"
             android:layout_columnWeight="1"
             android:text="C"
             android:layout_gravity="fill" />
@@ -233,13 +233,6 @@
             android:layout_gravity="fill" />
 
         <!-- 숫자 4, 5, 6 -->
-        <Button
-            android:id="@+id/button_tmp1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:text="tmp1"
-            android:layout_gravity="fill" />
 
         <Button
             android:id="@+id/button4"
@@ -267,14 +260,6 @@
             android:layout_gravity="fill" />
 
         <Button
-            android:id="@+id/buttontmp2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:text="tmp2"
-            android:layout_gravity="fill" />
-
-        <Button
             android:id="@+id/button1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -297,14 +282,6 @@
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
             android:text="3"
-            android:layout_gravity="fill" />
-
-        <Button
-            android:id="@+id/buttontmp3"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:text="tmp3"
             android:layout_gravity="fill" />
 
         <Button

@@ -9,7 +9,10 @@ import android.widget.ListView;
 import kr.pknu.seolmunhyeok201911938.model.CountryAdapter;
 
 public class CountrySelectionActivity extends Activity {
-    private final String[] countries = {"KRW", "USD", "JPY", "EUR", "GBP", "CNY", "AUD", "CAD", "CHF", "NZD"};
+    private final String[] countries = {"KRW", "USD", "JPY", "EUR", "GBP",
+                                        "CNY", "AUD", "CAD", "CHF", "NZD",
+                                        "SGD", "THB", "HKD", "PHP", "MYR",
+                                        "IDR", "RUB", "INR", "ZAR", "CZK"};
     private final int[] flags = {
             R.drawable.ic_flag_krw,
             R.drawable.ic_flag_usd,
@@ -20,7 +23,17 @@ public class CountrySelectionActivity extends Activity {
             R.drawable.ic_flag_aud,
             R.drawable.ic_flag_cad,
             R.drawable.ic_flag_chf,
-            R.drawable.ic_flag_nzd
+            R.drawable.ic_flag_nzd,
+            R.drawable.ic_flag_sgd,
+            R.drawable.ic_flag_thb,
+            R.drawable.ic_flag_hkd,
+            R.drawable.ic_flag_php,
+            R.drawable.ic_flag_myr,
+            R.drawable.ic_flag_idr,
+            R.drawable.ic_flag_rub,
+            R.drawable.ic_flag_inr,
+            R.drawable.ic_flag_zar,
+            R.drawable.ic_flag_czk
     };
 
     @Override

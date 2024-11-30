@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -90,6 +92,11 @@ public class MainActivity extends AppCompatActivity {
         setupCalculatorButtons();
     }
 
+    private void initViews() {
+
+    }
+
+    private static final long MAX_INPUT_VALUE = 9_999_999_999_999L;
     private void setupCalculatorButtons() {
         int[] buttonIds = {
                 R.id.button0, R.id.button1, R.id.button2, R.id.button3,
@@ -119,6 +126,17 @@ public class MainActivity extends AppCompatActivity {
                     currencyOutputTextViews[selectedCountryIndex].setText("0");
                 }
                 else {
+                    if (currentInput.length() > 0) {
+                        long currentValue = Long.parseLong(currentInput.toString());
+                        if (currentValue > MAX_INPUT_VALUE) {
+                            Toast.makeText(
+                                    this,
+                                    "입력 값이 너무 큽니다!",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                            return;
+                        }
+                    }
                     currentInput.append(buttonText);
                 }
 
@@ -213,22 +231,32 @@ public class MainActivity extends AppCompatActivity {
 
         String unit;
         switch (currencyCode) {
-            case "KRW": unit = " 대한민국 원"; break;
-            case "USD": unit = " 미국 달러"; break;
-            case "JPY": unit = " 일본 엔"; break;
-            case "EUR": unit = " 유로"; break;
-            case "GBP": unit = " 파운드 스털링"; break;
-            case "CNY": unit = " 중국 위안화"; break;
-            case "AUD": unit = " 호주 달러"; break;
-            case "CAD": unit = " 캐나다 달러"; break;
-            case "CHF": unit = " 스위스 프랑"; break;
-            case "NZD": unit = " 뉴질랜드 달러"; break;
+            case "KRW": unit = "대한민국 원"; break;
+            case "USD": unit = "미국 달러"; break;
+            case "JPY": unit = "일본 엔"; break;
+            case "EUR": unit = "유로"; break;
+            case "GBP": unit = "파운드 스털링"; break;
+            case "CNY": unit = "중국 위안화"; break;
+            case "AUD": unit = "호주 달러"; break;
+            case "CAD": unit = "캐나다 달러"; break;
+            case "CHF": unit = "스위스 프랑"; break;
+            case "NZD": unit = "뉴질랜드 달러"; break;
+            case "SGD": unit = "싱가포르 달러"; break;
+            case "THB": unit = "태국 바트"; break;
+            case "HKD": unit = "홍콩 달러"; break;
+            case "PHP": unit = "필리핀 페소"; break;
+            case "MYR": unit = "말레이시아 링깃"; break;
+            case "IDR": unit = "인도네시아 루피아"; break;
+            case "RUB": unit = "러시아 루블"; break;
+            case "INR": unit = "인도 루피"; break;
+            case "ZAR": unit = "남아프리카공화국 랜드"; break;
+            case "CZK": unit = "체코 코루나"; break;
 
             default: unit = "단위"; break;
         }
 
         StringBuilder result = new StringBuilder();
-        String[] units = {"", "만", "억", "조"};
+        String[] units = {"", "만 ", "억 ", "조 "};
         int unitIndex = 0;
 
         while (value > 0) {
@@ -240,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
             unitIndex++;
         }
 
-        return result.append(unit).toString();
+        return result.append(" " + unit).toString();
     }
 
     private String getCurrentTime() {

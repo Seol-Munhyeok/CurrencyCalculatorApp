@@ -65,6 +65,16 @@ public class CountryAdapter extends BaseAdapter {
             case "CAD": return "캐나다 달러";
             case "CHF": return "스위스 프랑";
             case "NZD": return "뉴질랜드 달러";
+            case "SGD": return "싱가포르 달러";
+            case "THB": return "태국 바트";
+            case "HKD": return "홍콩 달러";
+            case "PHP": return "필리핀 페소";
+            case "MYR": return "말레이시아 링깃";
+            case "IDR": return "인도네시아 루피아";
+            case "RUB": return "러시아 루블";
+            case "INR": return "인도 루피";
+            case "ZAR": return "남아프리카공화국 랜드";
+            case "CZK": return "체코 코루나";
             default: return "단위";
         }
     }
