@@ -69,6 +69,15 @@
                     android:padding="8dp"
                     android:clickable="true"
                     android:focusable="true"/>
+
+                <ImageButton
+                    android:id="@+id/graphButton1"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="6dp"
+                    android:src="@drawable/ic_graph_icon"
+                    android:contentDescription="환율 그래프 보기"
+                    android:background="?attr/selectableItemBackgroundBorderless" />
             </LinearLayout>
 
             <!-- 금액의 한글 표시 -->
@@ -120,6 +129,16 @@
                     android:textAlignment="center"
                     android:background="#FFFFFF"
                     android:padding="8dp" />
+
+                <ImageButton
+                    android:id="@+id/graphButton2"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="6dp"
+                    android:src="@drawable/ic_graph_icon"
+                    android:contentDescription="환율 그래프 보기"
+                    android:background="?attr/selectableItemBackgroundBorderless" />
+
             </LinearLayout>
 
             <!-- 금액의 한글 표시 -->
@@ -171,6 +190,16 @@
                     android:textAlignment="center"
                     android:background="#FFFFFF"
                     android:padding="8dp" />
+
+                <ImageButton
+                    android:id="@+id/graphButton3"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="6dp"
+                    android:src="@drawable/ic_graph_icon"
+                    android:contentDescription="환율 그래프 보기"
+                    android:background="?attr/selectableItemBackgroundBorderless" />
+
             </LinearLayout>
 
             <!-- 금액의 한글 표시 -->
