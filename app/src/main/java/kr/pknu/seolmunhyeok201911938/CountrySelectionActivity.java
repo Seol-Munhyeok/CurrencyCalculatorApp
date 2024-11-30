@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import kr.pknu.seolmunhyeok201911938.model.CountryAdapter;
+
 public class CountrySelectionActivity extends Activity {
     private final String[] countries = {"KRW", "USD", "JPY", "EUR", "GBP", "CNY", "AUD", "CAD", "CHF", "NZD"};
     private final int[] flags = {
@@ -28,7 +30,7 @@ public class CountrySelectionActivity extends Activity {
 
         ListView listView = findViewById(R.id.countryListView);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, countries);
+        CountryAdapter adapter = new CountryAdapter(this, countries, flags);
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener((parent, view, position, id) -> {

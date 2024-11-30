@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
             case "EUR": unit = " 유로"; break;
             case "GBP": unit = " 파운드 스털링"; break;
             case "CNY": unit = " 중국 위안화"; break;
-            case "AUD": unit = " 오스트레일리아 달러"; break;
+            case "AUD": unit = " 호주 달러"; break;
             case "CAD": unit = " 캐나다 달러"; break;
             case "CHF": unit = " 스위스 프랑"; break;
             case "NZD": unit = " 뉴질랜드 달러"; break;
@@ -260,8 +260,9 @@ public class MainActivity extends AppCompatActivity {
             if (countryIndex >= 0) {
                 countryTextViews[countryIndex].setText(selectedCountry);
                 flagImageViews[countryIndex].setImageResource(selectedFlag);
+
+                updateExchangeRates();
             }
         }
     }
-
 }
