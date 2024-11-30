@@ -2,12 +2,15 @@ package kr.pknu.seolmunhyeok201911938;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import kr.pknu.seolmunhyeok201911938.api.CurrencyApiService;
 import kr.pknu.seolmunhyeok201911938.api.RetrofitClient;
@@ -17,7 +20,12 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int REQUEST_CODE_COUNTRY = 1;
+    private static final int REQUEST_CODE_COUNTRY = 1;  // 다른 액티비티로 이동할 때 요청 구분용
+    private int selectedCountryIndex = -1;
+    private int lastSelectedCountryIndex = -1;
+    private Map<String, Double> exchangeRates = new HashMap<>();
+
+    private StringBuilder currentInput = new StringBuilder();
     private TextView currentTimeText;
     private TextView[] currencyOutputTextViews = new TextView[3];
     private TextView[] amountTextViewKoreanTextViews = new TextView[3];
@@ -26,9 +34,9 @@ public class MainActivity extends AppCompatActivity {
 
     private String[] defaultCountries = {"KRW", "USD", "JPY"};
     private int[] defaultFlags = {
-            R.drawable.ic_flag_placeholder, // 실제 KRW 국기 리소스로 교체
-            R.drawable.ic_flag_placeholder, // 실제 USD 국기 리소스로 교체
-            R.drawable.ic_flag_placeholder  // 실제 JPY 국기 리소스로 교체
+            R.drawable.ic_flag_krw,
+            R.drawable.ic_flag_usd,
+            R.drawable.ic_flag_jpy
     };
 
     @Override
@@ -49,20 +57,108 @@ public class MainActivity extends AppCompatActivity {
             currencyOutputTextViews[i] = findViewById(outputResId);
             amountTextViewKoreanTextViews[i] = findViewById(koreanResId);
 
-            // 초기 데이터 설정
             countryTextViews[i].setText(defaultCountries[i]);
             flagImageViews[i].setImageResource(defaultFlags[i]);
 
             int finalI = i;
             countryTextViews[i].setOnClickListener(view -> openCountrySelectionActivity(finalI));
+
+            currencyOutputTextViews[i].setOnClickListener(view -> {
+                selectedCountryIndex = finalI;
+                currentInput.setLength(0);
+            });
         }
 
+        for (int i = 0; i < currencyOutputTextViews.length; i++) {
+            int finalI = i;
+            currencyOutputTextViews[i].setOnClickListener(view -> {
+                if (lastSelectedCountryIndex != -1) {
+                    currencyOutputTextViews[lastSelectedCountryIndex].setBackgroundResource(0);
+                }
+
+                selectedCountryIndex = finalI;
+                lastSelectedCountryIndex = finalI;
+
+                currencyOutputTextViews[finalI].setBackgroundResource(R.drawable.yellow_border);
+
+                currentInput.setLength(0);
+            });
+
+            countryTextViews[i].setOnClickListener(view -> openCountrySelectionActivity(finalI));
+        }
         fetchExchangeRates();
+        setupCalculatorButtons();
+    }
+
+    private void setupCalculatorButtons() {
+        int[] buttonIds = {
+                R.id.button0, R.id.button1, R.id.button2, R.id.button3,
+                R.id.button4, R.id.button5, R.id.button6, R.id.button7,
+                R.id.button8, R.id.button9, R.id.button00, R.id.buttonClear,
+                R.id.buttonDelete
+        };
+
+        for (int id : buttonIds) {
+            findViewById(id).setOnClickListener(view -> {
+                if (selectedCountryIndex == -1) return;
+
+                Button button = (Button) view;
+                String buttonText = button.getText().toString();
+
+                if (buttonText.equals("C")) {
+                    currentInput.setLength(0);
+                    currencyOutputTextViews[selectedCountryIndex].setText("0");
+                } else if (buttonText.equals("←")) {
+                    if (currentInput.length() > 0) {
+                        currentInput.deleteCharAt(currentInput.length() - 1);
+                    } else {
+                        currencyOutputTextViews[selectedCountryIndex].setText("0");
+                    }
+                } else if (buttonText.equals("00")) {
+                    currentInput.append("00");
+                    currencyOutputTextViews[selectedCountryIndex].setText("0");
+                }
+                else {
+                    currentInput.append(buttonText);
+                }
+
+                String inputText = currentInput.toString();
+                currencyOutputTextViews[selectedCountryIndex].setText(inputText.isEmpty() ? "0" : inputText);
+
+                updateExchangeRates();
+            });
+        }
+    }
+
+    private void updateExchangeRates() {
+        if (selectedCountryIndex == -1 || currentInput.length() == 0 || currentInput.toString().equals("0")) {
+            for (int i = 0; i < amountTextViewKoreanTextViews.length; i++) {
+                currencyOutputTextViews[i].setText("0");
+                amountTextViewKoreanTextViews[i].setText(convertToKorean(0, countryTextViews[i].getText().toString()));
+            }
+            return;
+        }
+
+        double baseAmount = Double.parseDouble(currentInput.toString());
+        String baseCurrency = countryTextViews[selectedCountryIndex].getText().toString();
+
+        for (int i = 0; i < countryTextViews.length; i++) {
+            String targetCurrency = countryTextViews[i].getText().toString();
+            if (i == selectedCountryIndex) {
+                amountTextViewKoreanTextViews[i].setText(convertToKorean((long) baseAmount, targetCurrency));
+                continue;
+            }
+            double rate = exchangeRates.get(targetCurrency) / exchangeRates.get(baseCurrency);
+            double convertedAmount = baseAmount * rate;
+
+            currencyOutputTextViews[i].setText(String.format(Locale.getDefault(), "%.2f", convertedAmount));
+            amountTextViewKoreanTextViews[i].setText(convertToKorean((long) convertedAmount, targetCurrency));
+        }
     }
 
     private void openCountrySelectionActivity(int countryIndex) {
         Intent intent = new Intent(this, CountrySelectionActivity.class);
-        intent.putExtra("countryIndex", countryIndex); // 선택된 국가의 인덱스 전달
+        intent.putExtra("countryIndex", countryIndex);
         startActivityForResult(intent, REQUEST_CODE_COUNTRY);
     }
 
@@ -77,26 +173,25 @@ public class MainActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     CurrencyResponse rates = response.body();
 
+                    exchangeRates.clear();
+                    exchangeRates.putAll(rates.data);
+
                     // 각 텍스트뷰에 데이터 반영
                     for (int i = 0; i < countryTextViews.length; i++) {
                         String selectedCurrency = countryTextViews[i].getText().toString();
                         if (rates.data.containsKey(selectedCurrency)) {
                             double rate = rates.data.get(selectedCurrency);
 
-                            // 금액 계산 (예: KRW 기준 10000원)
-                            double baseAmount = 10000.0; // 기본값, 필요하면 사용자 입력 반영
+                            double baseAmount = 1.0;
                             double convertedAmount = baseAmount * rate;
 
-                            // 환율 값 업데이트
                             currencyOutputTextViews[i].setText(String.format(Locale.getDefault(), "%.2f", convertedAmount));
 
-                            // 한글 금액 표시 업데이트
-                            amountTextViewKoreanTextViews[i].setText(convertToKorean((long) convertedAmount));
+                            amountTextViewKoreanTextViews[i].setText(convertToKorean((long) convertedAmount, selectedCurrency));
                         }
                     }
 
-                    // 현재 시간 업데이트
-                    String formattedTime = formatTimestamp(rates.timestamp);
+                    String formattedTime = getCurrentTime();
                     currentTimeText.setText(formattedTime);
 
                 } else {
@@ -111,10 +206,25 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // 숫자를 한글로 변환하는 메서드
-    private String convertToKorean(long value) {
+    private String convertToKorean(long value, String currencyCode) {
         if (value == 0) {
-            return "0원";
+            return "0";
+        }
+
+        String unit;
+        switch (currencyCode) {
+            case "KRW": unit = " 대한민국 원"; break;
+            case "USD": unit = " 미국 달러"; break;
+            case "JPY": unit = " 일본 엔"; break;
+            case "EUR": unit = " 유로"; break;
+            case "GBP": unit = " 파운드 스털링"; break;
+            case "CNY": unit = " 중국 위안화"; break;
+            case "AUD": unit = " 오스트레일리아 달러"; break;
+            case "CAD": unit = " 캐나다 달러"; break;
+            case "CHF": unit = " 스위스 프랑"; break;
+            case "NZD": unit = " 뉴질랜드 달러"; break;
+
+            default: unit = "단위"; break;
         }
 
         StringBuilder result = new StringBuilder();
@@ -130,14 +240,12 @@ public class MainActivity extends AppCompatActivity {
             unitIndex++;
         }
 
-        return result.append("원").toString();
+        return result.append(unit).toString();
     }
 
-    // 타임스탬프 형식화 메서드
-    private String formatTimestamp(long timestamp) {
-        Date date = new Date(timestamp * 1000); // 서버에서 초 단위로 제공
+    private String getCurrentTime() {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        return "업데이트: " + formatter.format(date);
+        return "업데이트: " + formatter.format(new Date());
     }
 
     @Override
@@ -150,7 +258,6 @@ public class MainActivity extends AppCompatActivity {
             int selectedFlag = data.getIntExtra("selectedFlag", R.drawable.ic_flag_placeholder);
 
             if (countryIndex >= 0) {
-                // 텍스트뷰와 이미지뷰 업데이트
                 countryTextViews[countryIndex].setText(selectedCountry);
                 flagImageViews[countryIndex].setImageResource(selectedFlag);
             }

@@ -12,7 +12,7 @@
         android:id="@+id/currentTimeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="업데이트: 5:34, 오후 11월 29, 2024"
+        android:text="업데이트: "
         android:textSize="14sp"
         android:paddingBottom="8dp" />
 
@@ -66,7 +66,9 @@
                     android:text="0"
                     android:textAlignment="center"
                     android:background="#FFFFFF"
-                    android:padding="8dp" />
+                    android:padding="8dp"
+                    android:clickable="true"
+                    android:focusable="true"/>
             </LinearLayout>
 
             <!-- 금액의 한글 표시 -->
