@@ -13,6 +13,13 @@
         android:textSize="18sp"
         android:paddingBottom="8dp" />
 
+    <SearchView
+        android:id="@+id/countrySearchView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:queryHint="국가를 검색하세요"
+        android:paddingBottom="8dp" />
+
     <ListView
         android:id="@+id/countryListView"
         android:layout_width="match_parent"

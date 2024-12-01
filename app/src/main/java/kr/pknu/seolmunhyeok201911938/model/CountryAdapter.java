@@ -5,35 +5,62 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 import kr.pknu.seolmunhyeok201911938.R;
 
-public class CountryAdapter extends BaseAdapter {
+public class CountryAdapter extends BaseAdapter implements Filterable {
     private final Context context;
-    private final String[] countries;
-    private final int[] flags;
+    private final String[] originalCountries;
+    private final String[] originalCountryNames;
+    private final int[] originalFlags;
 
-    public CountryAdapter(Context context, String[] countries, int[] flags) {
+    private String[] filteredCountries;
+    private String[] filteredCountryNames;
+    private int[] filteredFlags;
+
+    public CountryAdapter(Context context, String[] countries, String[] countryNames, int[] flags) {
         this.context = context;
-        this.countries = countries;
-        this.flags = flags;
+        this.originalCountries = countries;
+        this.originalCountryNames = countryNames;
+        this.originalFlags = flags;
+
+        this.filteredCountries = countries;
+        this.filteredCountryNames = countryNames;
+        this.filteredFlags = flags;
     }
 
     @Override
     public int getCount() {
-        return countries.length;
+        return filteredCountries.length;
     }
 
     @Override
     public Object getItem(int position) {
-        return countries[position];
+        return filteredCountries[position];
     }
 
     @Override
     public long getItemId(int position) {
         return position;
+    }
+
+    public String getCountryAtPosition(int position) {
+        return filteredCountries[position];
+    }
+
+    public void updateData(String[] countries, String[] countryNames, int[] flags) {
+        this.filteredCountries = countries;
+        this.filteredCountryNames = countryNames;
+        this.filteredFlags = flags;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -45,12 +72,59 @@ public class CountryAdapter extends BaseAdapter {
         TextView countryNameTextView = convertView.findViewById(R.id.countryNameTextView);
         TextView currencyUnitTextView = convertView.findViewById(R.id.currencyUnitTextView);
 
-        flagImageView.setImageResource(flags[position]);
-        countryNameTextView.setText(countries[position]);
-        String currencyUnit = getCurrencyUnit(countries[position]);
+        flagImageView.setImageResource(filteredFlags[position]);
+        countryNameTextView.setText(filteredCountries[position]);
+        String currencyUnit = getCurrencyUnit(filteredCountries[position]);
         currencyUnitTextView.setText(currencyUnit);
 
         return convertView;
+    }
+
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                String query = constraint.toString().toLowerCase(Locale.getDefault()).trim();
+                FilterResults results = new FilterResults();
+
+                if (query.isEmpty()) {
+                    results.values = originalCountries;
+                    results.count = originalCountries.length;
+                } else {
+                    ArrayList<String> filteredCountriesList = new ArrayList<>();
+                    ArrayList<String> filteredCountryNamesList = new ArrayList<>();
+                    ArrayList<Integer> filteredFlagsList = new ArrayList<>();
+
+                    for (int i = 0; i < originalCountries.length; i++) {
+                        if (originalCountries[i].toLowerCase().contains(query) ||
+                                originalCountryNames[i].contains(query)) {
+                            filteredCountriesList.add(originalCountries[i]);
+                            filteredCountryNamesList.add(originalCountryNames[i]);
+                            filteredFlagsList.add(originalFlags[i]);
+                        }
+                    }
+
+                    results.values = new Object[]{
+                            filteredCountriesList.toArray(new String[0]),
+                            filteredCountryNamesList.toArray(new String[0]),
+                            filteredFlagsList.stream().mapToInt(i -> i).toArray()
+                    };
+                    results.count = filteredCountriesList.size();
+                }
+                return results;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                if (results.values instanceof Object[]) {
+                    Object[] filteredResults = (Object[]) results.values;
+                    filteredCountries = (String[]) filteredResults[0];
+                    filteredCountryNames = (String[]) filteredResults[1];
+                    filteredFlags = (int[]) filteredResults[2];
+                }
+                notifyDataSetChanged();
+            }
+        };
     }
 
     private String getCurrencyUnit(String country) {
