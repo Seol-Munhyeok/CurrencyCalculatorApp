@@ -127,6 +127,16 @@ public class CountryAdapter extends BaseAdapter implements Filterable {
         };
     }
 
+    public int getOriginalPosition(int filteredPosition) {
+        for (int i = 0; i < originalCountries.length; i++) {
+            if (originalCountries[i].equals(filteredCountries[filteredPosition])) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+
     private String getCurrencyUnit(String country) {
         switch (country) {
             case "KRW": return "대한민국 원";

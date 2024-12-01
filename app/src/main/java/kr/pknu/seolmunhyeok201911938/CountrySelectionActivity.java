@@ -56,8 +56,6 @@ public class CountrySelectionActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_country_selection);
 
-        initailizeIndexMap();
-
         ListView listView = findViewById(R.id.countryListView);
         SearchView searchView = findViewById(R.id.countrySearchView);
 
@@ -73,26 +71,7 @@ public class CountrySelectionActivity extends Activity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                String lowerCaseQuery = newText.toLowerCase();
-
-                List<String> filteredCountryList = new ArrayList<>();
-                List<String> filteredCountryNameList = new ArrayList<>();
-                List<Integer> filteredFlagList = new ArrayList<>();
-
-                for (int i = 0; i < countries.length; i++) {
-                    if (countries[i].toLowerCase().contains(lowerCaseQuery) ||
-                            countryNames[i].contains(newText)) {
-                        filteredCountryList.add(countries[i]);
-                        filteredCountryNameList.add(countryNames[i]);
-                        filteredFlagList.add(flags[i]);
-                    }
-                }
-
-                String[] filteredCountries = filteredCountryList.toArray(new String[0]);
-                String[] filteredCountryNames = filteredCountryNameList.toArray(new String[0]);
-                int[] filteredFlags = filteredFlagList.stream().mapToInt(i -> i).toArray();
-
-                adapter.updateData(filteredCountries, filteredCountryNames, filteredFlags);
+                adapter.getFilter().filter(newText);
                 return true;
             }
         });
@@ -100,39 +79,24 @@ public class CountrySelectionActivity extends Activity {
         listView.setOnItemClickListener((parent, view, position, id) -> {
             int countryIndex = getIntent().getIntExtra("countryIndex", -1);
 
-            String selectedCountry = adapter.getCountryAtPosition(position);
-            int originalIndex = countryIndexMap.get(selectedCountry);
+            int originalIndex = adapter.getOriginalPosition(position);
+            if (originalIndex == -1) {
+                return;
+            }
 
+            String selectedCountry = countries[originalIndex];
             String selectedCountryName = countryNames[originalIndex];
             int selectedFlag = flags[originalIndex];
 
             Intent resultIntent = new Intent();
             resultIntent.putExtra("countryIndex", countryIndex);
-            resultIntent.putExtra("selectedCountry", countries[position]);
+            resultIntent.putExtra("selectedCountry", selectedCountry);
             resultIntent.putExtra("selectedCountryName", selectedCountryName);
-            resultIntent.putExtra("selectedFlag", flags[position]);
+            resultIntent.putExtra("selectedFlag", selectedFlag);
 
             setResult(RESULT_OK, resultIntent);
             finish();
         });
 
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                adapter.getFilter().filter(newText);
-                return true;
-            }
-        });
-    }
-
-    private void initailizeIndexMap() {
-        for (int i = 0; i < countries.length; i++) {
-            countryIndexMap.put(countries[i], i);
-        }
     }
 }
