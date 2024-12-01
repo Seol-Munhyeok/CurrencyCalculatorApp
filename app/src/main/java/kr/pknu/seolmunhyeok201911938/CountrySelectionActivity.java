@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,13 +72,22 @@ public class CountrySelectionActivity extends Activity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                adapter.getFilter().filter(newText);
+                if (newText.isEmpty()) {
+                    adapter.getFilter().filter("");
+                } else {
+                    adapter.getFilter().filter(newText);
+                }
                 return true;
             }
         });
 
         listView.setOnItemClickListener((parent, view, position, id) -> {
             int countryIndex = getIntent().getIntExtra("countryIndex", -1);
+
+            if (adapter.getCount() == 0) {
+                Toast.makeText(CountrySelectionActivity.this, "선택할 수 있는 국가가 없습니다.", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             int originalIndex = adapter.getOriginalPosition(position);
             if (originalIndex == -1) {

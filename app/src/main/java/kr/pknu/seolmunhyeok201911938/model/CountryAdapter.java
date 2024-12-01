@@ -82,7 +82,7 @@ public class CountryAdapter extends BaseAdapter implements Filterable {
                 FilterResults results = new FilterResults();
 
                 if (query.isEmpty()) {
-                    results.values = originalCountries;
+                    results.values = new Object[]{originalCountries, originalCountryNames, originalFlags};
                     results.count = originalCountries.length;
                 } else {
                     ArrayList<String> filteredCountriesList = new ArrayList<>();
@@ -112,14 +112,18 @@ public class CountryAdapter extends BaseAdapter implements Filterable {
             protected void publishResults(CharSequence constraint, FilterResults results) {
                 if (results.values instanceof Object[]) {
                     Object[] filteredResults = (Object[]) results.values;
-                    filteredCountries = (String[]) filteredResults[0];
-                    filteredCountryNames = (String[]) filteredResults[1];
-                    filteredFlags = (int[]) filteredResults[2];
+
+                    if (filteredResults.length == 3) {
+                        filteredCountries = (String[]) filteredResults[0];
+                        filteredCountryNames = (String[]) filteredResults[1];
+                        filteredFlags = (int[]) filteredResults[2];
+                    }
                 }
                 notifyDataSetChanged();
             }
         };
     }
+
 
     public int getOriginalPosition(int filteredPosition) {
         for (int i = 0; i < originalCountries.length; i++) {
