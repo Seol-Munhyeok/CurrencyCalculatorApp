@@ -1,7 +1,10 @@
 package kr.pknu.seolmunhyeok201911938;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
+import android.util.Pair;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -10,8 +13,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -35,42 +41,21 @@ public class MainActivity extends AppCompatActivity {
     private TextView[] countryTextViews = new TextView[3];
     private ImageView[] flagImageViews = new ImageView[3];
 
-    private String[] defaultCountries = {"KRW", "USD", "JPY"};
-    private int[] defaultFlags = {
-            R.drawable.ic_flag_krw,
-            R.drawable.ic_flag_usd,
-            R.drawable.ic_flag_jpy
-    };
+    private SharedPreferences sharedPreferences;
+    private static final String PREF_NAME = "FavoriteCountries";
 
+
+    private String[] defaultCountries;
+    private int[] defaultFlags;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        currentTimeText = findViewById(R.id.currentTimeText);
+        sharedPreferences = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
 
-        for (int i = 0; i < countryTextViews.length; i++) {
-            int textResId = getResources().getIdentifier("currencyTextView" + (i + 1), "id", getPackageName());
-            int imageResId = getResources().getIdentifier("flagImageView" + (i + 1), "id", getPackageName());
-            int outputResId = getResources().getIdentifier("currencyOutput" + (i + 1), "id", getPackageName());
-            int koreanResId = getResources().getIdentifier("amountTextViewKorean" + (i + 1), "id", getPackageName());
-
-            countryTextViews[i] = findViewById(textResId);
-            flagImageViews[i] = findViewById(imageResId);
-            currencyOutputTextViews[i] = findViewById(outputResId);
-            amountTextViewKoreanTextViews[i] = findViewById(koreanResId);
-
-            countryTextViews[i].setText(defaultCountries[i]);
-            flagImageViews[i].setImageResource(defaultFlags[i]);
-
-            int finalI = i;
-            countryTextViews[i].setOnClickListener(view -> openCountrySelectionActivity(finalI));
-
-            currencyOutputTextViews[i].setOnClickListener(view -> {
-                selectedCountryIndex = finalI;
-                currentInput.setLength(0);
-            });
-        }
+        initializeFavoriteCountries();
+        initializeUI();
 
         for (int i = 0; i < countryTextViews.length; i++) {
             int finalI = i;
@@ -104,6 +89,91 @@ public class MainActivity extends AppCompatActivity {
         fetchExchangeRates();
         setupCalculatorButtons();
     }
+
+    private void initializeFavoriteCountries() {
+        List<String> favoriteCountries = new ArrayList<>();
+        List<Integer> favoriteFlags = new ArrayList<>();
+
+        String[] baseCountries = {"KRW", "USD", "JPY"};
+        int[] baseFlags = {
+                R.drawable.ic_flag_krw,
+                R.drawable.ic_flag_usd,
+                R.drawable.ic_flag_jpy
+        };
+
+        Map<String, ?> allFavorites = sharedPreferences.getAll();
+        if (!allFavorites.isEmpty()) {
+            for (int i = 0; i < baseCountries.length; i++) {
+                String country = baseCountries[i];
+                if (sharedPreferences.getBoolean(country, false)) {
+                    favoriteCountries.add(country);
+                    favoriteFlags.add(baseFlags[i]);
+                }
+            }
+            Log.d("initializeFavoriteCountries", "저장된 즐겨찾기 국가 불러오기 완료: " + favoriteCountries);
+        }
+
+        if (favoriteCountries.isEmpty()) {
+            favoriteCountries.addAll(Arrays.asList(baseCountries));
+            for (int flag : baseFlags) {
+                favoriteFlags.add(flag);
+            }
+
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            for (String country : favoriteCountries) {
+                editor.putBoolean(country, true);
+            }
+            editor.apply();
+            Log.d("initializeFavoriteCountries", "기본 국가가 설정되었습니다.");
+        }
+
+        for (int i = 0; i < baseCountries.length; i++) {
+            String country = baseCountries[i];
+            if (!favoriteCountries.contains(country)) {
+                favoriteCountries.add(country);
+                favoriteFlags.add(baseFlags[i]);
+            }
+        }
+
+        defaultCountries = favoriteCountries.toArray(new String[0]);
+        defaultFlags = new int[favoriteFlags.size()];
+        for (int i = 0; i < favoriteFlags.size(); i++) {
+            defaultFlags[i] = favoriteFlags.get(i);
+        }
+    }
+
+
+
+    private void initializeUI() {
+        currentTimeText = findViewById(R.id.currentTimeText);
+
+        for (int i = 0; i < countryTextViews.length; i++) {
+            int textResId = getResources().getIdentifier("currencyTextView" + (i + 1), "id", getPackageName());
+            int imageResId = getResources().getIdentifier("flagImageView" + (i + 1), "id", getPackageName());
+            int outputResId = getResources().getIdentifier("currencyOutput" + (i + 1), "id", getPackageName());
+            int koreanResId = getResources().getIdentifier("amountTextViewKorean" + (i + 1), "id", getPackageName());
+
+            countryTextViews[i] = findViewById(textResId);
+            flagImageViews[i] = findViewById(imageResId);
+            currencyOutputTextViews[i] = findViewById(outputResId);
+            amountTextViewKoreanTextViews[i] = findViewById(koreanResId);
+
+            countryTextViews[i].setText(defaultCountries[i]);
+            flagImageViews[i].setImageResource(defaultFlags[i]);
+
+            int finalI = i;
+            countryTextViews[i].setOnClickListener(view -> openCountrySelectionActivity(finalI));
+
+            currencyOutputTextViews[i].setOnClickListener(view -> {
+                selectedCountryIndex = finalI;
+                currentInput.setLength(0);
+            });
+        }
+
+        currencyOutputTextViews[1].setText("1.00");
+        amountTextViewKoreanTextViews[0].setText(convertToKorean(1, countryTextViews[0].getText().toString()));
+    }
+
 
     private static final int MAX_INPUT_LENGTH = 15;
     private void setupCalculatorButtons() {
@@ -216,7 +286,9 @@ public class MainActivity extends AppCompatActivity {
                     exchangeRates.clear();
                     exchangeRates.putAll(rates.data);
 
-                    // 각 텍스트뷰에 데이터 반영
+                    String baseCurrency = countryTextViews[1].getText().toString();
+                    exchangeRates.put(baseCurrency, 1.0);
+
                     for (int i = 0; i < countryTextViews.length; i++) {
                         String selectedCurrency = countryTextViews[i].getText().toString();
                         if (rates.data.containsKey(selectedCurrency)) {
@@ -308,6 +380,7 @@ public class MainActivity extends AppCompatActivity {
             int selectedFlag = data.getIntExtra("selectedFlag", R.drawable.ic_flag_placeholder);
 
             if (countryIndex >= 0) {
+                Log.d("MainActivity", "Updating country: " + selectedCountry);
                 countryTextViews[countryIndex].setText(selectedCountry);
                 flagImageViews[countryIndex].setImageResource(selectedFlag);
 
@@ -315,9 +388,12 @@ public class MainActivity extends AppCompatActivity {
                 currencyOutputTextViews[countryIndex].setText(inputText.isEmpty() ? "0" : inputText);
 
                 updateExchangeRates();
+            } else {
+                Log.d("MainActivity", "Invalid country index received");
             }
+        } else {
+            Log.d("MainActivity", "No valid result received from CountrySelectionActivity");
         }
     }
-
 
 }

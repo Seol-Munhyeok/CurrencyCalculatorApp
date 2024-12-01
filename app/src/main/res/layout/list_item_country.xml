@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="8dp">
+    android:padding="8dp"
+    android:gravity="center_vertical">
 
+    <!-- 국기 이미지 -->
     <ImageView
         android:id="@+id/flagImageView"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginEnd="16dp" />
 
+    <!-- 국가 이름 및 통화 단위 -->
     <LinearLayout
+        android:id="@+id/countryContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -33,4 +38,9 @@
             android:textColor="#888888" />
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/favoriteIcon"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:src="@drawable/ic_favorite_border" />
 </LinearLayout>

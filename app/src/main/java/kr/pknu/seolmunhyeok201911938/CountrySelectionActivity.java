@@ -2,6 +2,7 @@ package kr.pknu.seolmunhyeok201911938;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -49,13 +50,16 @@ public class CountrySelectionActivity extends Activity {
             R.drawable.ic_flag_czk
     };
 
-    private Map<String, Integer> countryIndexMap = new HashMap<>();
+    private static final String PREF_NAME = "FavoriteCountries";
     private CountryAdapter adapter;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_country_selection);
+
+        sharedPreferences = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
 
         ListView listView = findViewById(R.id.countryListView);
         SearchView searchView = findViewById(R.id.countrySearchView);
@@ -107,6 +111,25 @@ public class CountrySelectionActivity extends Activity {
             setResult(RESULT_OK, resultIntent);
             finish();
         });
+    }
+    @Override
+    public void onBackPressed() {
+        int favoriteCount = getFavoriteCount();
 
+        if (favoriteCount < 3) {
+            Toast.makeText(this, "즐겨찾기를 최소 3개 선택해야 합니다.", Toast.LENGTH_SHORT).show();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private int getFavoriteCount() {
+        int count = 0;
+        for (String country : countries) {
+            if (sharedPreferences.getBoolean(country, false)) {
+                count++;
+            }
+        }
+        return count;
     }
 }

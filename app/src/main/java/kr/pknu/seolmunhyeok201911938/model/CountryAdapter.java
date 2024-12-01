@@ -1,6 +1,10 @@
 package kr.pknu.seolmunhyeok201911938.model;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,7 +12,9 @@ import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +32,9 @@ public class CountryAdapter extends BaseAdapter implements Filterable {
     private String[] filteredCountryNames;
     private int[] filteredFlags;
 
+    private static final String PREF_NAME = "FavoriteCountries";
+    private SharedPreferences sharedPreferences;
+
     public CountryAdapter(Context context, String[] countries, String[] countryNames, int[] flags) {
         this.context = context;
         this.originalCountries = countries;
@@ -35,6 +44,8 @@ public class CountryAdapter extends BaseAdapter implements Filterable {
         this.filteredCountries = countries;
         this.filteredCountryNames = countryNames;
         this.filteredFlags = flags;
+
+        sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
     @Override
@@ -62,16 +73,47 @@ public class CountryAdapter extends BaseAdapter implements Filterable {
         if (convertView == null) {
             convertView = LayoutInflater.from(context).inflate(R.layout.list_item_country, parent, false);
         }
+
         ImageView flagImageView = convertView.findViewById(R.id.flagImageView);
         TextView countryNameTextView = convertView.findViewById(R.id.countryNameTextView);
         TextView currencyUnitTextView = convertView.findViewById(R.id.currencyUnitTextView);
+        ImageView favoriteIcon = convertView.findViewById(R.id.favoriteIcon);
+        LinearLayout countryContainer = convertView.findViewById(R.id.countryContainer);
 
+        String countryCode = filteredCountries[position];
         flagImageView.setImageResource(filteredFlags[position]);
         countryNameTextView.setText(filteredCountries[position]);
         String currencyUnit = getCurrencyUnit(filteredCountries[position]);
         currencyUnitTextView.setText(currencyUnit);
 
+        boolean isFavorite = sharedPreferences.getBoolean(countryCode, false);
+        favoriteIcon.setImageResource(isFavorite ? R.drawable.ic_favorite_border : R.drawable.ic_favorite);
+
+        favoriteIcon.setOnClickListener(v -> {
+            Log.d("CountryAdapter", "Favorite clicked: " + countryCode);
+            boolean currentState = sharedPreferences.getBoolean(countryCode, false);
+            int favoriteCount = getFavoriteCount();
+
+            if (!currentState && favoriteCount >= 3) {
+                Toast.makeText(context, "즐겨찾기는 3개까지 선택할 수 있습니다.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            sharedPreferences.edit().putBoolean(countryCode, !currentState).apply();
+            favoriteIcon.setImageResource(!currentState ? R.drawable.ic_favorite_border : R.drawable.ic_favorite);
+        });
+
         return convertView;
+    }
+
+    private int getFavoriteCount() {
+        int count = 0;
+        for (String country : originalCountries) {
+            if (sharedPreferences.getBoolean(country, false)) {
+                count++;
+            }
+        }
+        return count;
     }
 
     public Filter getFilter() {
