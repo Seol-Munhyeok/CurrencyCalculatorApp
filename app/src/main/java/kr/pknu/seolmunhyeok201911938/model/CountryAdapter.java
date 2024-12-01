@@ -52,14 +52,8 @@ public class CountryAdapter extends BaseAdapter implements Filterable {
         return position;
     }
 
-    public String getCountryAtPosition(int position) {
-        return filteredCountries[position];
-    }
-
-    public void updateData(String[] countries, String[] countryNames, int[] flags) {
+    public void updateData(String[] countries) {
         this.filteredCountries = countries;
-        this.filteredCountryNames = countryNames;
-        this.filteredFlags = flags;
         notifyDataSetChanged();
     }
 
