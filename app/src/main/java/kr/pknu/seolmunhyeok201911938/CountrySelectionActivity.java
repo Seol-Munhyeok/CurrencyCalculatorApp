@@ -86,6 +86,13 @@ public class CountrySelectionActivity extends Activity {
         });
 
         listView.setOnItemClickListener((parent, view, position, id) -> {
+            int favoriteCount = getFavoriteCount();
+
+            if (favoriteCount < 3) {
+                Toast.makeText(this, "즐겨찾기를 3개 이상 설정해야 국가를 선택할 수 있습니다.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             int countryIndex = getIntent().getIntExtra("countryIndex", -1);
 
             if (adapter.getCount() == 0) {
@@ -125,8 +132,9 @@ public class CountrySelectionActivity extends Activity {
 
     private int getFavoriteCount() {
         int count = 0;
-        for (String country : countries) {
-            if (sharedPreferences.getBoolean(country, false)) {
+        Map<String, ?> allFavorites = sharedPreferences.getAll();
+        for (Object value : allFavorites.values()) {
+            if (value instanceof Boolean && (Boolean) value) {
                 count++;
             }
         }

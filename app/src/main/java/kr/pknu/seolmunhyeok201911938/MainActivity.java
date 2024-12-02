@@ -94,45 +94,45 @@ public class MainActivity extends AppCompatActivity {
         List<String> favoriteCountries = new ArrayList<>();
         List<Integer> favoriteFlags = new ArrayList<>();
 
-        String[] baseCountries = {"KRW", "USD", "JPY"};
-        int[] baseFlags = {
-                R.drawable.ic_flag_krw,
-                R.drawable.ic_flag_usd,
-                R.drawable.ic_flag_jpy
+        String[] allCountries = {"KRW", "USD", "JPY", "HKD", "CHF", "EUR", "MYR", "CAD", "ZAR", "INR", "CNY", "THB", "AUD", "SGD", "GBP", "CZK", "IDR", "NZD", "RUB"};
+        int[] allFlags = {
+                R.drawable.ic_flag_krw, R.drawable.ic_flag_usd, R.drawable.ic_flag_jpy,
+                R.drawable.ic_flag_hkd, R.drawable.ic_flag_chf, R.drawable.ic_flag_eur,
+                R.drawable.ic_flag_myr, R.drawable.ic_flag_cad, R.drawable.ic_flag_zar,
+                R.drawable.ic_flag_inr, R.drawable.ic_flag_cny, R.drawable.ic_flag_thb,
+                R.drawable.ic_flag_aud, R.drawable.ic_flag_sgd, R.drawable.ic_flag_gbp,
+                R.drawable.ic_flag_czk, R.drawable.ic_flag_idr, R.drawable.ic_flag_nzd,
+                R.drawable.ic_flag_rub
         };
 
         Map<String, ?> allFavorites = sharedPreferences.getAll();
-        if (!allFavorites.isEmpty()) {
-            for (int i = 0; i < baseCountries.length; i++) {
-                String country = baseCountries[i];
-                if (sharedPreferences.getBoolean(country, false)) {
+        Log.d("initializeFavoriteCountries", "allFavorites: " + allFavorites);
+
+        for (Map.Entry<String, ?> entry : allFavorites.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof Boolean && (Boolean) value) {
+                String country = entry.getKey();
+                int flagIndex = Arrays.asList(allCountries).indexOf(country);
+                if (flagIndex != -1) {
                     favoriteCountries.add(country);
-                    favoriteFlags.add(baseFlags[i]);
+                    favoriteFlags.add(allFlags[flagIndex]);
+                } else {
+                    Log.w("initializeFavoriteCountries", "allFlags에서 찾을 수 없는 국가: " + country);
                 }
             }
-            Log.d("initializeFavoriteCountries", "저장된 즐겨찾기 국가 불러오기 완료: " + favoriteCountries);
         }
+        Log.d("initializeFavoriteCountries", "check1-favoriteCountries: " + favoriteCountries);
 
-        if (favoriteCountries.isEmpty()) {
-            favoriteCountries.addAll(Arrays.asList(baseCountries));
-            for (int flag : baseFlags) {
-                favoriteFlags.add(flag);
-            }
+        // 즐겨찾기가 3개 미만일 경우 기본값 추가
+        while (favoriteCountries.size() < 3) {
+            String country = allCountries[favoriteCountries.size()];
+            int flag = allFlags[favoriteCountries.size()];
+            favoriteCountries.add(country);
+            favoriteFlags.add(flag);
 
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            for (String country : favoriteCountries) {
-                editor.putBoolean(country, true);
-            }
+            editor.putBoolean(country, true);
             editor.apply();
-            Log.d("initializeFavoriteCountries", "기본 국가가 설정되었습니다.");
-        }
-
-        for (int i = 0; i < baseCountries.length; i++) {
-            String country = baseCountries[i];
-            if (!favoriteCountries.contains(country)) {
-                favoriteCountries.add(country);
-                favoriteFlags.add(baseFlags[i]);
-            }
         }
 
         defaultCountries = favoriteCountries.toArray(new String[0]);
@@ -140,14 +140,26 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < favoriteFlags.size(); i++) {
             defaultFlags[i] = favoriteFlags.get(i);
         }
+        Log.d("initializeFavoriteCountries", "favoriteCountries: " + favoriteCountries);
+        Log.d("initializeFavoriteCountries", "favoriteFlags: " + favoriteFlags);
+        Log.d("initializeFavoriteCountries", "defaultCountries: " + Arrays.toString(defaultCountries));
+        Log.d("initializeFavoriteCountries", "defaultFlags: " + Arrays.toString(defaultFlags));
+
+        Log.d("initializeFavoriteCountries", "최종 즐겨찾기 국가: " + favoriteCountries);
     }
 
-
-
     private void initializeUI() {
+        if (defaultCountries == null || defaultFlags == null || defaultCountries.length < 3 || defaultFlags.length < 3) {
+            Log.e("initializeUI", "defaultCountries 또는 defaultFlags가 3개 미만입니다.");
+            return;
+        }
         currentTimeText = findViewById(R.id.currentTimeText);
 
         for (int i = 0; i < countryTextViews.length; i++) {
+            if (i >= defaultCountries.length || i >= defaultFlags.length) {
+                Log.e("initializeUI", "defaultCountries 또는 defaultFlags의 크기가 부족합니다.");
+                break;
+            }
             int textResId = getResources().getIdentifier("currencyTextView" + (i + 1), "id", getPackageName());
             int imageResId = getResources().getIdentifier("flagImageView" + (i + 1), "id", getPackageName());
             int outputResId = getResources().getIdentifier("currencyOutput" + (i + 1), "id", getPackageName());
@@ -378,7 +390,12 @@ public class MainActivity extends AppCompatActivity {
             int countryIndex = data.getIntExtra("countryIndex", -1);
             String selectedCountry = data.getStringExtra("selectedCountry");
             int selectedFlag = data.getIntExtra("selectedFlag", R.drawable.ic_flag_placeholder);
+            boolean isFavorite = data.getBooleanExtra("isFavorite", false);
 
+            if (selectedCountry != null) {
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean(selectedCountry, isFavorite).apply();
+            }
             if (countryIndex >= 0) {
                 Log.d("MainActivity", "Updating country: " + selectedCountry);
                 countryTextViews[countryIndex].setText(selectedCountry);
@@ -386,7 +403,6 @@ public class MainActivity extends AppCompatActivity {
 
                 String inputText = currentInput.toString();
                 currencyOutputTextViews[countryIndex].setText(inputText.isEmpty() ? "0" : inputText);
-
                 updateExchangeRates();
             } else {
                 Log.d("MainActivity", "Invalid country index received");

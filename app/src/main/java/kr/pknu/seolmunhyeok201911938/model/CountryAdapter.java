@@ -19,6 +19,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import kr.pknu.seolmunhyeok201911938.R;
 
@@ -92,8 +93,8 @@ public class CountryAdapter extends BaseAdapter implements Filterable {
         favoriteIcon.setOnClickListener(v -> {
             Log.d("CountryAdapter", "Favorite clicked: " + countryCode);
             boolean currentState = sharedPreferences.getBoolean(countryCode, false);
-            int favoriteCount = getFavoriteCount();
 
+            int favoriteCount = getFavoriteCount();
             if (!currentState && favoriteCount >= 3) {
                 Toast.makeText(context, "즐겨찾기는 3개까지 선택할 수 있습니다.", Toast.LENGTH_SHORT).show();
                 return;
@@ -101,6 +102,8 @@ public class CountryAdapter extends BaseAdapter implements Filterable {
 
             sharedPreferences.edit().putBoolean(countryCode, !currentState).apply();
             favoriteIcon.setImageResource(!currentState ? R.drawable.ic_favorite_border : R.drawable.ic_favorite);
+
+            Log.d("CountryAdapter", "SharedPreferences 상태: " + sharedPreferences.getAll());
         });
 
         return convertView;
@@ -108,8 +111,9 @@ public class CountryAdapter extends BaseAdapter implements Filterable {
 
     private int getFavoriteCount() {
         int count = 0;
-        for (String country : originalCountries) {
-            if (sharedPreferences.getBoolean(country, false)) {
+        Map<String, ?> allFavorites = sharedPreferences.getAll();
+        for (Object value : allFavorites.values()) {
+            if (value instanceof Boolean && (Boolean) value) {
                 count++;
             }
         }
